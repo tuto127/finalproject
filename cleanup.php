@@ -7,12 +7,12 @@ error_reporting(E_ALL);
 
 
 $finishedurl = $_SESSION['finishedURL'];
-$urlBefore = $_SESSION['url2'];
+$urlBefore = $_SESSION['urlprocess'];
 $queueURL = $_SESSION['queueurl'];
 $topicArn = $_SESSION['topicArn'];
 $domain = $_SESSION['domain'];
 $bucketCleanUp = $_SESSION['bucket'];
-$SourceFile = $_SESSION['SourceFile'];
+$aux2 = $_SESSION['SourceFile'];
 
 $prefix = basename(preg_replace("/\\.[^.\\s]{3,4}$/", "", $SourceFile)).'.png';
 
