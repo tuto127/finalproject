@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <?php
 session_start();
@@ -8,7 +7,7 @@ error_reporting(E_ALL);
 
 
 $finishedurl = $_SESSION['finishedURL'];
-$urlBefore = $_SESSION['url2'];
+$urlBefore = $_SESSION['urlbefore'];
 $queueURL = $_SESSION['queueurl'];
 $topicArn = $_SESSION['topicArn'];
 $domain = $_SESSION['domain'];
@@ -33,19 +32,15 @@ $aws = Aws::factory('/var/www/vendor/aws/aws-sdk-php/src/Aws/Common/Resources/cu
 // Instantiate the S3 client with your AWS credentials and desired AWS region
 
 $client = $aws->get('S3');
+
 $sdbclient = $aws->get('SimpleDb');
+
 $sqsclient = $aws->get('Sqs');
+
 $snsclient = $aws->get('Sns'); 
 
 
-// -------------------------------------------add code to consume the Queue to make sure the job is done
-
-$result = $sqsclient->deleteQueue(array(
-    // QueueUrl is required
-    'QueueUrl' => $queueURL,
-));
-
-// -------------------------------------------add code to send the SMS message of the finished S3 URL
+//add code to send the SMS message of the finished S3 URL
 
 $exp="select * from  $domain";
 
@@ -70,35 +65,31 @@ $result = $snsclient->publish(array(
 ));
 
 
-// ------------------------------------------Set object expire to remove the image in one day
-//bool date_default_timezone_set ('America/Chicago'));
-//$date = new DateTime("2012-07-05 16:43:21", new DateTimeZone('America/Chicago')); 
-
-$date = date('Y-m-d H:i:s'); 
-$currentDate = strtotime($date);
-$futureDate = $currentDate+(60*10);
-$formatDate = date("Y-m-d H:i:s", $futureDate);
-
+//Set object expire to remove the image in one day
 
 $result = $client->putBucketLifecycle(array(
-    // Bucket is required
     'Bucket' => $bucketCleanUp,
-    // Rules is required
     'Rules' => array(
         array(
             'Expiration' => array(
-			    //'Date' => 'Y-m-d H:i:s' | $formatDate,
+			  
                 'Days' => 1,
             ),
             'ID' => 'string',
-            // Prefix is required
             'Prefix' => $prefix,
-            // Status is required
             'Status' => 'Enabled',
         ),
-        // ... repeated
     ),
 ));
+
+
+//add code to consume the Queue to make sure the job is done
+
+$result = $sqsclient->deleteQueue(array(
+    // QueueUrl is required
+    'QueueUrl' => $queueURL,
+));
+
 ?> 
 <html>
 <head><title>Clean Up PHP</title></head>
