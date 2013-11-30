@@ -14,7 +14,7 @@ $domain = $_SESSION['domain'];
 $bucketCleanUp = $_SESSION['bucket'];
 $aux2 = $_SESSION['SourceFile'];
 
-$prefix = basename(preg_replace("/\\.[^.\\s]{3,4}$/", "", $SourceFile)).'.png';
+$prefix = basename(preg_replace("/\\.[^.\\s]{3,4}$/", "", $aux2)).'.png';
 
 
 // Include the SDK using the Composer autoloader
