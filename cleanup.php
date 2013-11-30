@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 
 
 $finishedurl = $_SESSION['finishedURL'];
-$urlBefore = $_SESSION['urlbefore'];
+$url = $_SESSION['url'];
 $queueURL = $_SESSION['queueurl'];
 $topicArn = $_SESSION['topicArn'];
 $domain = $_SESSION['domain'];
@@ -60,7 +60,7 @@ $result = $snsclient->publish(array(
     'TargetArn' => $topicArn,
     // Message is required
     'Message' => $finishedurl,
-    ////'Subject' => $finishedurl,
+    //'Subject' => $finishedurl,
     'MessageStructure' => 'sms',
 ));
 
@@ -95,7 +95,7 @@ $result = $sqsclient->deleteQueue(array(
 <head><title>Clean Up PHP</title></head>
 <body>
 <h2> The image before</h2>
-<img src = "<?php echo $urlBefore ?>">
+<img src = "<?php echo $url ?>">
 <h2> The image after</h2>
 <img src = "<?php echo $finishedurl ?>">
 </body>
