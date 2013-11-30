@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <?php
-ini_set('display_errors',1);
-error_reporting(E_ALL);
 #retrieve these values that were set in process.php to make our code more flexible
 session_start();
+ini_set('display_errors',1); 
+error_reporting(E_ALL);
 $queueURL = $_SESSION['queueurl'];
 $domain = $_SESSION['domain'];
 $topicArn = $_SESSION['topicArn'];
 $urlBefore = $_SESSION['url'];
+
 
 // Include the SDK using the Composer autoloader
 require 'vendor/autoload.php';
@@ -28,7 +29,7 @@ $sdbclient = $aws->get('SimpleDb');
 
 $sqsclient = $aws->get('Sqs');
 
-$mbody="";
+$mbody=" ";
 
 
 #####################################################
@@ -37,8 +38,8 @@ $mbody="";
 $result = $sqsclient->receiveMessage(array(
     // QueueUrl is required
     'QueueUrl' => $queueURL,
-    'MaxNumberOfMessages' => 1, 
-    'WaitTimeSeconds' => 15,
+    'MaxNumberOfMessages' => 1,
+	'WaitTimeSeconds' => 10,
 ));
 ######################################3
 # Probably need some logic in here to handle delays)
@@ -52,7 +53,7 @@ foreach ($result->getPath('Messages/*/Body') as $messageBody) {
 ##############################################
 # Select from SimpleDB element where id = the id in the Queue
 ##############################################
-#$exp = "select * from itm544 where id = '$mbody'";
+#$exp = "select * from itm544jrh where id = '$mbody'";
 $exp = "select * from $domain where id = '$mbody'";
 echo "\n".$exp."\n";
 
@@ -66,15 +67,14 @@ $iterator = $sdbclient->getIterator('Select', array(
 ####################################################################
 # Declare some variables as place holders for the select object
 ####################################################################
-$email =' ';
+$email = ' ';
 $rawurl = ' ';
 $finishedurl = ' ';
 $bucket = ' ';
 $id = ' ';
 $phone = ' ';
 $filename = ' ';
-//$localfilename = ""; // this is a local variabel used to store the content of the s3 object
-
+//$localfilename = " "; // this is a local variable used to store the content of the s3 object
 ###################################################################
 # Now we are going to loop through the response object to get the 
 # values of the returned object
@@ -131,17 +131,22 @@ foreach ($iterator as $item) {
 ############################################################################
 $s3urlprefix = 'https://s3.amazonaws.com/';
 $localfilename = "/tmp/" . $filename;
+
+
 $result = $client->getObject(array(
     'Bucket' => $bucket,
     'Key'    => $filename,
     'SaveAs' => $localfilename,
 ));
+
+
 ############################################################################
 #  Now that we have called the s3 object and downloaded (getObject) the file
 # to our local system - lets pass the file to our watermark library 
 # http://en.wikipedia.org/wiki/Watermark -- using a function  
 ###########################################################################
 addStamp($localfilename);
+
 
 #########################################################################
 # PHP function for adding a "stamp" or watermark through the php gd library
@@ -164,51 +169,48 @@ $sy = imagesy($stamp);
 imagecopy($im, $stamp, imagesx($im) - $sx - $marge_right, imagesy($im) - $sy - $marge_bottom, 0, 0, imagesx($stamp), imagesy($stamp));
 
 // Output and free memory
-imagepng($im, '/tmp/' .basename(preg_replace("/\\.[^.\\s]{3,4}$/", "", $image)).'new.png');
+imagepng($im, '/tmp/'.basename(preg_replace("/\\.[^.\\s]{3,4}$/", "", $image)).'modify.png');
 imagedestroy($im);
 
 } // end of function
-
-$aux = basename(preg_replace("/\\.[^.\\s]{3,4}$/", "", $localfilename)).'new.png';
-$aux2 = preg_replace("/\\.[^.\\s]{3,4}$/", "", $localfilename).'new.png';
+$Key = basename(preg_replace("/\\.[^.\\s]{3,4}$/", "", $localfilename)).'modify.png';
+$SourceFile = preg_replace("/\\.[^.\\s]{3,4}$/", "", $localfilename).'modify.png';
 
 $result = $client->putObject(array(
     'ACL'        => 'public-read',
     'Bucket'     => $bucket,
-    'Key'        => $aux,
-    'SourceFile' => $aux2,
+    'Key'        => $Key,
+    'SourceFile' => $SourceFile,
     'Metadata'   => array(
-    'timestamp' => time(),
-    'md5' =>  md5_file($aux2),
+        'timestamp' => time(),
+        'md5' =>  md5_file($SourceFile),
     )
 ));
+$finishedurl = $result['ObjectURL'];
 
-$finishedurl=$result['ObjectURL'];
 $result = $sdbclient->putAttributes(array(
     // DomainName is required
     'DomainName' => $domain,
    // ItemName is required
-    'ItemName' => 'images-'.$mbody,
+    'ItemName' =>'images-'.$mbody ,
     // Attributes is required
     'Attributes' => array(
-        
         array(
             'Name' => 'finishedurl',
-            'Replace' => True,
+			'Replace' => True, 
             'Value' => $finishedurl,
         ),     
-        
     ),
 ));
 
-// Lets tranfer this info to cleanup
 $_SESSION['finishedURL']=$finishedurl;
-$_SESSION['urlprocess']=$urlBefore;
+$_SESSION['url2']=$urlBefore;
 $_SESSION['queueurl']=$queueURL;
 $_SESSION['domain']=$domain;
 $_SESSION['topicArn']=$topicArn;
 $_SESSION['bucket']=$bucket;
-$_SESSION['SourceFile']=$aux2;
+$_SESSION['SourceFile']=$SourceFile;
+
 ?>
 <html>
 <head><title>Resize PHP</title></head>
