@@ -213,8 +213,9 @@ $_SESSION['SourceFile']=$aux2;
 <html>
 <head><title>Resize PHP</title></head>
 <body>
-    <script>
-window.location = 'cleanup.php';
 <img src="/tmp/<? echo $filename ?>" />
+<script>
+window.location = 'cleanup.php';
+</script>
 </body>
 </html>
