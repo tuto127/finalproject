@@ -5,7 +5,7 @@
     use Aws\Common\Aws;
 
     //The bucket's name you want to keep at your S3.
-    $dontDelete = 'Custom-Config';
+    $dontDelete = 'pm1tuto';
 
     // Instantiate the S3 client with your AWS credentials and desired AWS region Aws\Common\Aws;
 
