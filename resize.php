@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 $queueURL = $_SESSION['queueurl'];
 $domain = $_SESSION['domain'];
 $topicArn = $_SESSION['topicArn'];
-$urlBefore = $_SESSION['url'];
+$url = $_SESSION['url'];
 
 
 // Include the SDK using the Composer autoloader
