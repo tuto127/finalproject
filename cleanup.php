@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <?php
 session_start();
@@ -7,14 +8,14 @@ error_reporting(E_ALL);
 
 
 $finishedurl = $_SESSION['finishedURL'];
-$urlBefore = $_SESSION['urlprocess'];
+$urlBefore = $_SESSION['url2'];
 $queueURL = $_SESSION['queueurl'];
 $topicArn = $_SESSION['topicArn'];
 $domain = $_SESSION['domain'];
 $bucketCleanUp = $_SESSION['bucket'];
-$aux2 = $_SESSION['SourceFile'];
+$SourceFile = $_SESSION['SourceFile'];
 
-$prefix = basename(preg_replace("/\\.[^.\\s]{3,4}$/", "", $aux2)).'.png';
+$prefix = basename(preg_replace("/\\.[^.\\s]{3,4}$/", "", $SourceFile)).'.png';
 
 
 // Include the SDK using the Composer autoloader
@@ -100,7 +101,7 @@ $result = $client->putBucketLifecycle(array(
 ));
 ?> 
 <html>
-<head><title>clean up</title></head>
+<head><title>Clean Up PHP</title></head>
 <body>
 <h2> The image before</h2>
 <img src = "<?php echo $urlBefore ?>">
