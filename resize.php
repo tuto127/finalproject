@@ -204,7 +204,7 @@ $result = $sdbclient->putAttributes(array(
 ));
 
 $_SESSION['finishedURL']=$finishedurl;
-$_SESSION['url2']=$urlBefore;
+$_SESSION['url']=$url;
 $_SESSION['queueurl']=$queueURL;
 $_SESSION['domain']=$domain;
 $_SESSION['topicArn']=$topicArn;
