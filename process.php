@@ -12,6 +12,7 @@ use Aws\Sns\Exception\InvalidParameterException;
 use Aws\Common\Aws;
 use Aws\Sqs\SqsClient;
 use Aws\SimpleDb\SimpleDbClient;
+use Aws\Ses\SesClient;
 
 // Instantiate the S3 client with your AWS credentials and desired AWS regionws\Common\Aws;
 
@@ -25,6 +26,8 @@ $sdbclient = $aws->get('SimpleDb');
 $snsclient = $aws->get('Sns'); 
 
 $sqsclient = $aws->get('Sqs');
+
+$sesclient = $aws->get('Ses');
 
 $UUID = uniqid();
 $email = str_replace("@","-",$_POST["email"]); 
@@ -180,6 +183,30 @@ $result = $sqsclient->sendMessage(array(
     // MessageBody is required
     'MessageBody' => $UUID,
     'DelaySeconds' => 0,
+));
+
+$result = $sesclient->sendEmail(array(
+    // Source is required
+    'Source' => 'adeagust@hawk.iit.edu',
+    // Destination is required
+    'Destination' => array(
+        'ToAddresses' => array($_POST['email']),
+    ),
+    // Message is required
+    'Message' => array(
+        // Subject is required
+        'Subject' => array(
+            // Data is required
+            'Data' => 'Thank You',
+        ),
+        // Body is required
+        'Body' => array(
+            'Text' => array(
+                // Data is required
+                'Data' => 'Thanks for using our services.  We are allways happy to help',
+            ),
+        ),
+    ),
 ));
 
 $_SESSION['domain']=$domain;
